@@ -178,7 +178,7 @@ $(function () {
         * https://api.uomg.com/doc-rand.music.html
         */
         // $.getJSON('/music', function (json, textStatus) {
-        $.getJSON('https://api.uomg.com/api/rand.music?sort=热歌榜&format=json', function (json, textStatus) {
+        $.getJSON('https://api.uomg.com/api/rand.music?sort=电音榜&format=json', function (json, textStatus) {
             if (json.code == 1) {
                 if (flag == 0)
                     i.attr('class', 'fa fa-play');
