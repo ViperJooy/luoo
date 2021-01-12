@@ -1,4 +1,4 @@
-$(function () {
+$(function() {
     var playerTrack = $("#player-track"),
         bgArtwork = $('#bg-artwork'),
         bgArtworkUrl,
@@ -26,7 +26,7 @@ $(function () {
         currIndex = -1;
 
     function playPause() {
-        setTimeout(function () {
+        setTimeout(function() {
             if (audio.paused) {
                 playerTrack.addClass('active');
                 albumArt.addClass('active');
@@ -150,7 +150,7 @@ $(function () {
 
     function checkBuffering() {
         clearInterval(buffInterval);
-        buffInterval = setInterval(function () {
+        buffInterval = setInterval(function() {
             if ((nTime == 0) || (bTime - nTime) > 1000)
                 albumArt.addClass('buffering');
             else
@@ -174,12 +174,119 @@ $(function () {
 
     function selectTrack2(flag) {
         /*
-        * 歌单详细见
-        * https://api.uomg.com/doc-rand.music.html
-        */
-        // $.getJSON('/music', function (json, textStatus) {
-        $.getJSON('https://api.uomg.com/api/rand.music?sort=电音榜&format=json', function (json, textStatus) {
-            if (json.code == 1) {
+         * 歌单详细见
+         * https://api.uomg.com/doc-rand.music.html
+         */
+        // $.getJSON('https://api.uomg.com/api/rand.music?sort=电音榜&format=json', function(json, textStatus) {
+        //     if (json.code == 1) {
+        //         if (flag == 0)
+        //             i.attr('class', 'fa fa-play');
+        //         else {
+        //             albumArt.removeClass('buffering');
+        //             i.attr('class', 'fa fa-pause');
+        //         }
+
+        //         seekBar.width(0);
+        //         trackTime.removeClass('active');
+        //         tProgress.text('00:00');
+        //         tTime.text('00:00');
+
+        //         currName = json.data.name;
+        //         currArtist = json.data.artistsname;
+        //         currAlbum = json.data.album;
+        //         currVol = json.data.vol;
+        //         currJournal = json.data.journal;
+        //         currArtwork = json.data.picurl;
+        //         audio.src = json.data.url;
+
+
+        //         nTime = 0;
+        //         bTime = new Date();
+        //         bTime = bTime.getTime();
+
+        //         if (flag != 0) {
+        //             audio.play();
+        //             playerTrack.addClass('active');
+        //             albumArt.addClass('active');
+
+        //             clearInterval(buffInterval);
+        //             checkBuffering();
+        //         }
+
+        //         luooName.text(currName);
+        //         luooArtist.text(currArtist);
+        //         luooAlbum.text(currAlbum);
+        //         luooVol.text(currVol);
+        //         luooJournal.text(currJournal);
+
+        //         albumArt.find('img.active').removeClass('active');
+        //         $('#album-pic').addClass('active');
+
+        //         $('#album-pic').attr('src', currArtwork);
+
+        //         bgArtwork.css({
+        //             'background-image': 'url(' + currArtwork + ')'
+        //         });
+        //     }
+        // });
+
+        //使用Promise
+        new Promise(function(resolve) {
+            $.ajax({
+                url: 'https://charger.yiqipower.com/music/playlist/detail?id=43032291',
+                dataType: 'json',
+                success: function(result) {
+                    var trackIds = result.playlist.trackIds
+                    var randomItem = trackIds[Math.floor(Math.random() * trackIds.length)];
+                    resolve(randomItem.id)
+                },
+                error: function(error) {
+                    reject(error);
+                }
+            });
+        }).then(function(trackIds) {
+            $.ajax({
+                url: 'https://charger.yiqipower.com/music/song/detail',
+                data: { ids: trackIds },
+                dataType: 'json',
+                success: function(r) {
+                    change(r)
+                },
+                error: function(error) {
+
+                }
+            });
+
+            $.ajax({
+                url: 'https://charger.yiqipower.com/music/song/url',
+                data: { id: trackIds },
+                dataType: 'json',
+                success: function(song) {
+                    console.log(song)
+                        // setSongUrl(song)
+                },
+                error: function(error) {
+
+                }
+            });
+        })
+
+        function setSongUrl(song) {
+            if (json.code == 200) {
+                audio.src = url.data[0].url;
+                // if (flag != 0) {
+                //     audio.play();
+                //     playerTrack.addClass('active');
+                //     albumArt.addClass('active');
+
+                //     clearInterval(buffInterval);
+                //     checkBuffering();
+                // }
+            }
+        }
+
+        function change(json) {
+            if (json.code == 200) {
                 if (flag == 0)
                     i.attr('class', 'fa fa-play');
                 else {
@@ -192,25 +299,13 @@ $(function () {
                 tProgress.text('00:00');
                 tTime.text('00:00');
 
-                // cdnhost = 'https://zh-1255879903.cos.ap-chengdu.myqcloud.com/luoo/';
-
-
-                // var songId = getQueryVariable(json.data.url, "id")
-
-                // $.getJSON("http://music.163.com/api/song/detail/?id=" + songId + "&ids=%5B " + songId + "%5D", function (song, textStatus) {
-                // console.log(song)
-                //  alert(song.songs[0].name)
-
-
-                // });
-
-                currName = json.data.name;
-                currArtist = json.data.artistsname;
-                currAlbum = json.data.album;
-                currVol = json.data.vol;
-                currJournal = json.data.journal;
-                currArtwork = json.data.picurl;
-                audio.src = json.data.url;
+                currName = json.songs[0].name;
+                currArtist = json.songs[0].ar[0].name;
+                currAlbum = json.songs[0].al.name;
+                currVol = json.songs[0].al.name;
+                currJournal = json.songs[0].al.name;
+                currArtwork = json.songs[0].al.picUrl;
+                // audio.src = json.data[0].url;
 
 
                 nTime = 0;
@@ -218,8 +313,8 @@ $(function () {
                 bTime = bTime.getTime();
 
                 if (flag != 0) {
-                    audio.play();
-                    playerTrack.addClass('active');
+                    // audio.play();
+                    // playerTrack.addClass('active');
                     albumArt.addClass('active');
 
                     clearInterval(buffInterval);
@@ -241,8 +336,9 @@ $(function () {
                     'background-image': 'url(' + currArtwork + ')'
                 });
             }
-        });
+        }
     }
+
 
     function initPlayer() {
         audio = new Audio();
@@ -253,7 +349,7 @@ $(function () {
 
         playPauseButton.on('click', playPause);
 
-        sArea.mousemove(function (event) {
+        sArea.mousemove(function(event) {
             showHover(event);
         });
 
@@ -263,45 +359,45 @@ $(function () {
 
         $(audio).on('timeupdate', updateCurrTime);
 
-        playPreviousTrackButton.on('click', function () {
-        // if (audio.currentTime <= 30) {alert("当前音乐播放时间未超过30秒！/n Please try again 30 seconds later!");return false;}
+        playPreviousTrackButton.on('click', function() {
+            // if (audio.currentTime <= 30) {alert("当前音乐播放时间未超过30秒！/n Please try again 30 seconds later!");return false;}
             selectTrack2(-1);
         });
-        playNextTrackButton.on('click', function () {
-        // if (audio.currentTime <= 30) {alert("当前音乐播放时间未超过30秒！/n Please try again 30 seconds later!");return false;}
+        playNextTrackButton.on('click', function() {
+            // if (audio.currentTime <= 30) {alert("当前音乐播放时间未超过30秒！/n Please try again 30 seconds later!");return false;}
             selectTrack2(1);
         });
-        audio.addEventListener("ended", function () {
+        audio.addEventListener("ended", function() {
             selectTrack2(1);
         });
     }
 
     initPlayer();
 
-    document.body.onkeyup = function (e) {  //亦可绑定到audio，当鼠标点击到audio之后再按键可触发
+    document.body.onkeyup = function(e) { //亦可绑定到audio，当鼠标点击到audio之后再按键可触发
         var event = e || window.event;
         console.log('keyCode : ' + event.keyCode);
         console.log('volume : ' + audio.volume);
         if (!arguments.callee.pause) {
             arguments.callee.pause = false;
         }
-        if (event.keyCode == 40) {  //下
+        if (event.keyCode == 40) { //下
             try {
                 audio.volume -= 0.1;
             } catch (e) {
                 console.log('audio.volume is already the smallest : ' + audio.volume);
             }
-        } else if (event.keyCode == 38) {  //上
+        } else if (event.keyCode == 38) { //上
             try {
                 audio.volume += 0.1;
             } catch (e) {
                 console.log('audio.volume is already the largest : ' + audio.volume);
             }
-        } else if (event.keyCode == 39) {  //右
+        } else if (event.keyCode == 39) { //右
             audio.currentTime += 10;
-        } else if (event.keyCode == 37) {  //左
+        } else if (event.keyCode == 37) { //左
             audio.currentTime -= 10;
-        } else if (event.keyCode == 13) {  //Enter下一首
+        } else if (event.keyCode == 13) { //Enter下一首
             // if (audio.currentTime <= 30) { alert("当前音乐播放时间未超过30秒！/n Please try again 30 seconds later!"); return false; }
             return new selectTrack2(1);
         } else if (event.keyCode == 32) {
