@@ -162,180 +162,114 @@ $(function() {
         }, 100);
     }
 
+    //获取歌单列表
+    function getPlayList(pid) {
+        var result = pid;
+        $.ajax({
+            url: 'https://charger.yiqipower.com/music/playlist/detail',
+            dataType: 'json',
+            data: { id: pid },
+            cache: false,
+            async: false,
+            success: function(data) {
+                if (data.code == 200) {
+                    result = data.playlist.trackIds // 注意这里不可以在前面加var 关键字
+                }
 
-    function getQueryVariable(url, variable) {
-        var vars = url.split("?");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if (pair[0] == variable) { return pair[1]; }
-        }
-        return (false);
+            }
+        })
+        return result;
     }
 
+    var viperList = getPlayList(43032291)
+
+    // (jquery)封装Promise对象和ajax过程
+    var ajaxPromiseGet = function(param) {
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: param.url,
+                type: 'get',
+                data: param.data || '',
+                success: function(data) {
+                    resolve(data);
+                },
+                error: function(error) {
+                    reject(error)
+                }
+            });
+        });
+    };
+
+
     function selectTrack2(flag) {
-        /*
-         * 歌单详细见
-         * https://api.uomg.com/doc-rand.music.html
-         */
-        // $.getJSON('https://api.uomg.com/api/rand.music?sort=电音榜&format=json', function(json, textStatus) {
-        //     if (json.code == 1) {
-        //         if (flag == 0)
-        //             i.attr('class', 'fa fa-play');
-        //         else {
-        //             albumArt.removeClass('buffering');
-        //             i.attr('class', 'fa fa-pause');
-        //         }
+        var randomItemId = viperList[Math.floor(Math.random() * viperList.length)].id;
+        //获取viper的歌单列表,id = 歌单id
+        var detail = ajaxPromiseGet({
+            url: 'https://charger.yiqipower.com/music/song/detail',
+            data: { ids: randomItemId }
+        });
 
-        //         seekBar.width(0);
-        //         trackTime.removeClass('active');
-        //         tProgress.text('00:00');
-        //         tTime.text('00:00');
-
-        //         currName = json.data.name;
-        //         currArtist = json.data.artistsname;
-        //         currAlbum = json.data.album;
-        //         currVol = json.data.vol;
-        //         currJournal = json.data.journal;
-        //         currArtwork = json.data.picurl;
-        //         audio.src = json.data.url;
+        // 根据歌曲id获取歌曲详情
+        detail.then(function(detail) {
+            console.log(detail)
+            change(detail)
+        }).catch(function(err) {
+            console.log(err);
+        });
 
 
-        //         nTime = 0;
-        //         bTime = new Date();
-        //         bTime = bTime.getTime();
+        function change(detail) {
 
-        //         if (flag != 0) {
-        //             audio.play();
-        //             playerTrack.addClass('active');
-        //             albumArt.addClass('active');
-
-        //             clearInterval(buffInterval);
-        //             checkBuffering();
-        //         }
-
-        //         luooName.text(currName);
-        //         luooArtist.text(currArtist);
-        //         luooAlbum.text(currAlbum);
-        //         luooVol.text(currVol);
-        //         luooJournal.text(currJournal);
-
-        //         albumArt.find('img.active').removeClass('active');
-        //         $('#album-pic').addClass('active');
-
-        //         $('#album-pic').attr('src', currArtwork);
-
-        //         bgArtwork.css({
-        //             'background-image': 'url(' + currArtwork + ')'
-        //         });
-        //     }
-        // });
-
-        //使用Promise
-        new Promise(function(resolve) {
-            $.ajax({
-                url: 'https://charger.yiqipower.com/music/playlist/detail?id=43032291',
-                dataType: 'json',
-                success: function(result) {
-                    var trackIds = result.playlist.trackIds
-                    var randomItem = trackIds[Math.floor(Math.random() * trackIds.length)];
-                    resolve(randomItem.id)
-                },
-                error: function(error) {
-                    reject(error);
-                }
-            });
-        }).then(function(trackIds) {
-            $.ajax({
-                url: 'https://charger.yiqipower.com/music/song/detail',
-                data: { ids: trackIds },
-                dataType: 'json',
-                success: function(r) {
-                    change(r)
-                },
-                error: function(error) {
-
-                }
-            });
-
-            $.ajax({
-                url: 'https://charger.yiqipower.com/music/song/url',
-                data: { id: trackIds },
-                dataType: 'json',
-                success: function(song) {
-                    console.log(song)
-                        // setSongUrl(song)
-                },
-                error: function(error) {
-
-                }
-            });
-        })
-
-        function setSongUrl(song) {
-            if (json.code == 200) {
-                audio.src = url.data[0].url;
-                // if (flag != 0) {
-                //     audio.play();
-                //     playerTrack.addClass('active');
-                //     albumArt.addClass('active');
-
-                //     clearInterval(buffInterval);
-                //     checkBuffering();
-                // }
+            if (flag == 0)
+                i.attr('class', 'fa fa-play');
+            else {
+                albumArt.removeClass('buffering');
+                i.attr('class', 'fa fa-pause');
             }
-        }
 
-        function change(json) {
-            if (json.code == 200) {
-                if (flag == 0)
-                    i.attr('class', 'fa fa-play');
-                else {
-                    albumArt.removeClass('buffering');
-                    i.attr('class', 'fa fa-pause');
-                }
+            seekBar.width(0);
+            trackTime.removeClass('active');
+            tProgress.text('00:00');
+            tTime.text('00:00');
 
-                seekBar.width(0);
-                trackTime.removeClass('active');
-                tProgress.text('00:00');
-                tTime.text('00:00');
+            console.log(detail.songs[0].name)
 
-                currName = json.songs[0].name;
-                currArtist = json.songs[0].ar[0].name;
-                currAlbum = json.songs[0].al.name;
-                currVol = json.songs[0].al.name;
-                currJournal = json.songs[0].al.name;
-                currArtwork = json.songs[0].al.picUrl;
-                // audio.src = json.data[0].url;
+            currName = detail.songs[0].name;
+            currArtist = detail.songs[0].ar[0].name;
+            currAlbum = detail.songs[0].al.name;
+            currVol = detail.songs[0].v;
+            currJournal = detail.songs[0].id;
+            currArtwork = detail.songs[0].al.picUrl;
+            audio.src = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3"
 
+            nTime = 0;
+            bTime = new Date();
+            bTime = bTime.getTime();
 
-                nTime = 0;
-                bTime = new Date();
-                bTime = bTime.getTime();
+            if (flag != 0) {
+                audio.play();
+                playerTrack.addClass('active');
+                albumArt.addClass('active');
 
-                if (flag != 0) {
-                    // audio.play();
-                    // playerTrack.addClass('active');
-                    albumArt.addClass('active');
-
-                    clearInterval(buffInterval);
-                    checkBuffering();
-                }
-
-                luooName.text(currName);
-                luooArtist.text(currArtist);
-                luooAlbum.text(currAlbum);
-                luooVol.text(currVol);
-                luooJournal.text(currJournal);
-
-                albumArt.find('img.active').removeClass('active');
-                $('#album-pic').addClass('active');
-
-                $('#album-pic').attr('src', currArtwork);
-
-                bgArtwork.css({
-                    'background-image': 'url(' + currArtwork + ')'
-                });
+                clearInterval(buffInterval);
+                checkBuffering();
             }
+
+            luooName.text(currName);
+            luooArtist.text(currArtist);
+            luooAlbum.text(currAlbum);
+            luooVol.text(currVol);
+            luooJournal.text(currJournal);
+
+            albumArt.find('img.active').removeClass('active');
+            $('#album-pic').addClass('active');
+
+            $('#album-pic').attr('src', currArtwork);
+
+            bgArtwork.css({
+                'background-image': 'url(' + currArtwork + ')'
+            });
+
         }
     }
 
