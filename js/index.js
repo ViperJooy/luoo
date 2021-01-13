@@ -211,7 +211,7 @@ $(function() {
 
         // 根据歌曲id获取歌曲详情
         detail.then(function(detail) {
-            console.log(detail)
+            // console.log(detail)
             change(detail)
         }).catch(function(err) {
             console.log(err);
@@ -232,15 +232,16 @@ $(function() {
             tProgress.text('00:00');
             tTime.text('00:00');
 
-            console.log(detail.songs[0].name)
-
             currName = detail.songs[0].name;
             currArtist = detail.songs[0].ar[0].name;
             currAlbum = detail.songs[0].al.name;
             currVol = detail.songs[0].v;
             currJournal = detail.songs[0].id;
             currArtwork = detail.songs[0].al.picUrl;
-            audio.src = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3"
+            var songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
+            audio.src = songUrl
+                // $("#downloadUrl").attr({ "value": songUrl })
+            $("#downloadUrl").val(songUrl)
 
             nTime = 0;
             bTime = new Date();
