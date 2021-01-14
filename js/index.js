@@ -231,7 +231,8 @@ $(function() {
                 success: function(data) {
                     if (data.code == 200) {
                         if (data.data[0].url == null) {
-                            selectTrack2(1)
+                            setTimeout(selectTrack2(1), 2000)
+
                         } else {
                             songUrl = data.data[0].url
                         }
@@ -260,7 +261,7 @@ $(function() {
             currVol = detail.songs[0].v;
             currJournal = detail.songs[0].id;
             currArtwork = detail.songs[0].al.picUrl;
-            songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
+            // songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
             audio.src = songUrl
             songId = currJournal
 
@@ -333,22 +334,6 @@ $(function() {
                 var url = songUrl.replace("http", "https")　
                 saveAs(url, luooName.text());
                 return true;
-                // $.ajax({
-                //     url: 'https://charger.yiqipower.com/music/song/url',
-                //     dataType: 'json',
-                //     data: {
-                //         id: songId
-                //     },
-                //     success: function(data) {
-                //         if (data.code == 200) {
-                //             var url = data.data[0].url
-                //             var url = url.replace("http", "https")　
-                //             saveAs(url, luooName.text());
-                //         }
-
-                //     }
-                // })
-                // return true;
             } else {
                 return false;
             }
