@@ -317,7 +317,9 @@ $(function() {
                     },
                     success: function(data) {
                         if (data.code == 200) {
-                            saveAs(data.data[0].url, $("#downloadName").val());
+                            var url = data.data[0].url
+                            var url = url.replace("http", "https")　
+                            saveAs(url, $("#downloadName").val());
                         }
 
                     }
