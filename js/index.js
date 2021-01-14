@@ -221,18 +221,18 @@ $(function() {
 
 
         function change(detail) {
-
             $.ajax({
                 url: 'https://charger.yiqipower.com/music/song/url',
                 dataType: 'json',
                 data: {
                     id: detail.songs[0].id
                 },
+                cache: false,
+                async: false,
                 success: function(data) {
                     if (data.code == 200) {
                         if (data.data[0].url == null) {
-                            setTimeout(selectTrack2(1), 2000)
-
+                            selectTrack2(1)
                         } else {
                             songUrl = data.data[0].url
                         }
