@@ -213,14 +213,34 @@ $(function() {
 
         // 根据歌曲id获取歌曲详情
         detail.then(function(detail) {
-            // console.log(detail)
-            change(detail)
-        }).catch(function(err) {
-            console.log(err);
-        });
+                change(detail)
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
 
 
         function change(detail) {
+
+            $.ajax({
+                url: 'https://charger.yiqipower.com/music/song/url',
+                dataType: 'json',
+                data: {
+                    id: detail.songs[0].id
+                },
+                success: function(data) {
+                    if (data.code == 200) {
+                        if (data.data[0].url == null) {
+                            selectTrack2(1)
+                        } else {
+                            songUrl = data.data[0].url
+                        }
+
+                    }
+
+                }
+            })
+
 
             if (flag == 0)
                 i.attr('class', 'fa fa-play');
@@ -310,23 +330,25 @@ $(function() {
 
         $("#download").click(function() {
             if (window.confirm('是否下载此歌曲')) {
-
-                $.ajax({
-                    url: 'https://charger.yiqipower.com/music/song/url',
-                    dataType: 'json',
-                    data: {
-                        id: songId
-                    },
-                    success: function(data) {
-                        if (data.code == 200) {
-                            var url = data.data[0].url
-                            var url = url.replace("http", "https")　
-                            saveAs(url, luooName.text());
-                        }
-
-                    }
-                })
+                var url = songUrl.replace("http", "https")　
+                saveAs(url, luooName.text());
                 return true;
+                // $.ajax({
+                //     url: 'https://charger.yiqipower.com/music/song/url',
+                //     dataType: 'json',
+                //     data: {
+                //         id: songId
+                //     },
+                //     success: function(data) {
+                //         if (data.code == 200) {
+                //             var url = data.data[0].url
+                //             var url = url.replace("http", "https")　
+                //             saveAs(url, luooName.text());
+                //         }
+
+                //     }
+                // })
+                // return true;
             } else {
                 return false;
             }
