@@ -23,6 +23,8 @@ $(function() {
         albumArtworks = ['images/luoo.jpg'],
         playPreviousTrackButton = $('#play-previous'),
         playNextTrackButton = $('#play-next'),
+        songId,
+        songUrl,
         currIndex = -1;
 
     function playPause() {
@@ -238,10 +240,9 @@ $(function() {
             currVol = detail.songs[0].v;
             currJournal = detail.songs[0].id;
             currArtwork = detail.songs[0].al.picUrl;
-            var songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
+            songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
             audio.src = songUrl
-            $("#downloadId").val(detail.songs[0].id)
-            $("#downloadName").val(detail.songs[0].name)
+            songId = currJournal
 
             nTime = 0;
             bTime = new Date();
@@ -309,17 +310,18 @@ $(function() {
 
         $("#download").click(function() {
             if (window.confirm('是否下载此歌曲')) {
+
                 $.ajax({
                     url: 'https://charger.yiqipower.com/music/song/url',
                     dataType: 'json',
                     data: {
-                        id: $("#downloadId").val()
+                        id: songId
                     },
                     success: function(data) {
                         if (data.code == 200) {
                             var url = data.data[0].url
                             var url = url.replace("http", "https")　
-                            saveAs(url, $("#downloadName").val());
+                            saveAs(url, luooName.text());
                         }
 
                     }
