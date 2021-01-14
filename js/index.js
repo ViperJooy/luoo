@@ -240,8 +240,8 @@ $(function() {
             currArtwork = detail.songs[0].al.picUrl;
             var songUrl = "https://music.163.com/song/media/outer/url?id=" + detail.songs[0].id + ".mp3";
             audio.src = songUrl
-                // $("#downloadUrl").attr({ "value": songUrl })
-            $("#downloadUrl").val(songUrl)
+            $("#downloadId").val(detail.songs[0].id)
+            $("#downloadName").val(detail.songs[0].name)
 
             nTime = 0;
             bTime = new Date();
@@ -275,6 +275,7 @@ $(function() {
     }
 
 
+
     function initPlayer() {
         audio = new Audio();
 
@@ -304,6 +305,29 @@ $(function() {
         });
         audio.addEventListener("ended", function() {
             selectTrack2(1);
+        });
+
+        $("#download").click(function() {
+            if (window.confirm('是否下载此歌曲')) {
+                $.ajax({
+                    url: 'https://charger.yiqipower.com/music/song/url',
+                    dataType: 'json',
+                    data: {
+                        id: $("#downloadId").val()
+                    },
+                    success: function(data) {
+                        if (data.code == 200) {
+                            saveAs(data.data[0].url, $("#downloadName").val());
+                        }
+
+                    }
+                })
+                return true;
+            } else {
+                return false;
+            }
+
+
         });
     }
 
