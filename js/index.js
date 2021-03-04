@@ -25,6 +25,7 @@ $(function() {
         playNextTrackButton = $('#play-next'),
         songId,
         songUrl,
+        baseURL = "/music",
         currIndex = -1;
 
     function playPause() {
@@ -168,7 +169,7 @@ $(function() {
     function getPlayList(pid) {
         var result = pid;
         $.ajax({
-            url: 'https://charger.yiqipower.com/music/playlist/detail',
+            url: baseURL + '/playlist/detail',
             dataType: 'json',
             data: { id: pid },
             cache: false,
@@ -207,7 +208,7 @@ $(function() {
         var randomItemId = viperList[Math.floor(Math.random() * viperList.length)].id;
         //获取viper的歌单列表,id = 歌单id
         var detail = ajaxPromiseGet({
-            url: 'https://charger.yiqipower.com/music/song/detail',
+            url: baseURL + '/song/detail',
             data: { ids: randomItemId }
         });
 
@@ -222,7 +223,7 @@ $(function() {
 
         function change(detail) {
             $.ajax({
-                url: 'https://charger.yiqipower.com/music/song/url',
+                url: baseURL + '/song/url',
                 dataType: 'json',
                 data: {
                     id: detail.songs[0].id
