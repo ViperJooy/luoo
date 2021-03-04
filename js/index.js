@@ -25,7 +25,7 @@ $(function() {
         playNextTrackButton = $('#play-next'),
         songId,
         songUrl,
-        baseURL = "/music",
+        baseURL = "http://music.viper.work:3000",
         currIndex = -1;
 
     function playPause() {
