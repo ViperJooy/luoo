@@ -26,7 +26,7 @@ $(function() {
         songId,
         songUrl,
         // baseURL = "/music",
-        baseURL = "http://music.viper.work/music",
+        baseURL = "https://netease-cloud-music-api-three-tau.vercel.app/",
         currIndex = -1;
 
     function playPause() {
